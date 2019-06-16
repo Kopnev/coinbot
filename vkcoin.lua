@@ -313,12 +313,12 @@ end)
 end
 
 function goupdate()
-sampAddChatMessage(('[Testing]: Обнаружено обновление. AutoReload может конфликтовать. Обновляюсь...'), color)
-sampAddChatMessage(('[Testing]: Текущая версия: '..thisScript().version..". Новая версия: "..version), color)
+sampAddChatMessage(('[BotVkCoin]: Обнаружено обновление. AutoReload может конфликтовать. Обновляюсь...'), 0xF1CB0)
+sampAddChatMessage(('[BotVkCoin]: Текущая версия: '..thisScript().version..". Новая версия: "..version), 0xF1CB0)
 wait(300)
 downloadUrlToFile(updatelink, thisScript().path, function(id3, status1, p13, p23) -- качает ваш файлик с latest version
   if status1 == dlstatus.STATUS_ENDDOWNLOADDATA then
-  sampAddChatMessage(('[Testing]: Обновление завершено!'), color)
+  sampAddChatMessage(('[BotVkCoin]: Обновление завершено!'), 0xF1CB0)
   thisScript():reload()
 end
 end)
