@@ -299,6 +299,7 @@ function update()
       updatelink = info.updateurl
       if info and info.latest then
         version = tonumber(info.latest) -- переводит версию в число
+	ver = tonumber(info.version)
         if version > thisScript().version_num then -- если версия больше чем версия установленная то...
           new = 1
 					sampAddChatMessage(('[BotVkCoin]: {FFFFFF}Доступно обновление!'), 0xF1CB09)
@@ -314,7 +315,7 @@ end
 
 function goupdate()
 sampAddChatMessage(('[BotVkCoin]: Обнаружено обновление. AutoReload может конфликтовать. Обновляюсь...'), 0xF1CB0)
-sampAddChatMessage(('[BotVkCoin]: Текущая версия: '..thisScript().version..". Новая версия: "..version), 0xF1CB0)
+sampAddChatMessage(('[BotVkCoin]: Текущая версия: '..thisScript().version..". Новая версия: "..ver), 0xF1CB0)
 wait(300)
 downloadUrlToFile(updatelink, thisScript().path, function(id3, status1, p13, p23) -- качает ваш файлик с latest version
   if status1 == dlstatus.STATUS_ENDDOWNLOADDATA then
