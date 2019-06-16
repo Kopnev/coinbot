@@ -1,3 +1,8 @@
+script_name('vkcoin')
+script_author('kopnev')
+script_version('1.1')
+script_version_number(2)
+
 require 'sampfuncs'
 require 'moonloader'
 
@@ -9,6 +14,8 @@ local encoding = require 'encoding'
 encoding.default = 'CP1251'
 u8 = encoding.UTF8
 activebot = false
+
+local dlstatus = require('moonloader').download_status
 
 imgui.SwitchContext()
 local style = imgui.GetStyle()
@@ -75,24 +82,27 @@ local text_buffer = imgui.ImBuffer(256)
 
 local radio1 = imgui.ImInt(0)
 local limit = imgui.ImInt(0)
+local delay = imgui.ImInt(350)
 local click = imgui.ImBool(false)
 local nolimit = imgui.ImBool(true)
+local new = 0
 
 function main()
   if not isSampLoaded() or not isSampfuncsLoaded() then return end
   while not isSampAvailable() do wait(100) end
   sampRegisterChatCommand("botvk", cmd_imgui)
-  sampAddChatMessage('[BotVkCoin] {FFFFFF}������ ��������. ���������: {F1CB09}/botvk', 0xF1CB09)
+	update()
+  sampAddChatMessage('[BotVkCoin] {FFFFFF}Скрипт загружен. Активация: {F1CB09}/botvk', 0xF1CB09)
 
   --cmd_imgui()
 
     while true do
-	wait(10)
+			wait(delay.v)
 		  if main_windows_state.v == false then imgui.Process = false end
 
 		  if testCheat("bb") and activebot == true then
 		  	activebot = false
-		  	sampAddChatMessage('[BotVkCoin] {FFFFFF}��� �������� ���� ������', 0xF1CB09)
+		  	sampAddChatMessage('[BotVkCoin] {FFFFFF}Бот завершил свою работу', 0xF1CB09)
 		  	wait(400)
 		  end
 
@@ -100,23 +110,21 @@ function main()
 		  	cmd_imgui()
 		  end
 
+			if activebot == true then botvk() end
 
-		  if click.v == true then
+			if click.v == true then
 		  	if not tdid then
-		        sampAddChatMessage('[BotVkCoin] {FFFFFF}�������� ���� �������', 0xF1CB09)
+		        sampAddChatMessage('[BotVkCoin] {FFFFFF}Откройте свой телефон', 0xF1CB09)
 		        click.v = false
     		end
+
 
     		if tdid then
                     sampSendClickTextdraw(tdid)
                end
 
 		  end
-
-		  if activebot == true then botvk() end
 	end
-
-
 
 end
 
@@ -149,7 +157,7 @@ function botvk()
 		end
 
 	else
-		sampAddChatMessage('[BotVkCoin] {FFFFFF}��� �������� ������', 0xF1CB09)
+		sampAddChatMessage('[BotVkCoin] {FFFFFF}Бот завершил работу', 0xF1CB09)
 		activebot = false
 
 	end
@@ -184,14 +192,19 @@ function imgui.OnDrawFrame()
 
 	imgui.SetNextWindowPos(imgui.ImVec2(imgui.GetIO().DisplaySize.x - 185, imgui.GetIO().DisplaySize.y / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(250, 300), imgui.Cond.FirstUseEver)
-	imgui.Begin('CoinMiner', main_windows_state, imgui.WindowFlags.MenuBar)
+	imgui.Begin('		  CoinMiner | version ' .. thisScript().version, main_windows_state, imgui.WindowFlags.MenuBar)
 
 	if imgui.BeginMenuBar() then
-		if imgui.BeginMenu(u8'����') then
-			 if imgui.MenuItem(u8'����������') then
-			 	sampAddChatMessage('[BotVkCoin] {FFFFFF}�����: ������ ������.', 0xF1CB09)
-			 	sampAddChatMessage('[BotVkCoin] {FFFFFF}��: vk.com/d.k8515', 0xF1CB09)
-			 	sampAddChatMessage('[BotVkCoin] {FFFFFF}���������� ���: ������� | �������� ����', 0xF1CB09)
+		if imgui.BeginMenu(u8'Инфо') then
+			 if imgui.MenuItem(u8'Информация') then
+			 	sampAddChatMessage('[BotVkCoin] {FFFFFF}Автор: Даниил Копнев.', 0xF1CB09)
+			 	sampAddChatMessage('[BotVkCoin] {FFFFFF}Вк: vk.com/d.k8515', 0xF1CB09)
+			 	sampAddChatMessage('[BotVkCoin] {FFFFFF}Специально для: Аризона | Полезные вещи', 0xF1CB09)
+			 end
+			 if new == 1 then
+				 if imgui.MenuItem(u8'Обновление') then
+					 lua_thread.create(goupdate) -- апдейт
+				 end
 			 end
 			imgui.EndMenu()
 		end
@@ -202,42 +215,44 @@ function imgui.OnDrawFrame()
         imgui.NewLine()
         imgui.SameLine(3)
 
-	if imgui.TreeNode(u8'������� ��������') then
+	if imgui.TreeNode(u8'Покупка улчшений') then
 
 
 
-		if imgui.TreeNode(u8'�������� ��� ��������') then
-			imgui.RadioButton(u8'���� ����', radio1, 0)
-			imgui.RadioButton(u8'����������', radio1, 1)
-			imgui.RadioButton(u8'������ ���������', radio1, 2)
-			imgui.RadioButton(u8'��������������', radio1, 3)
-			imgui.RadioButton(u8'������ Arizona Games', radio1, 4)
-			imgui.RadioButton(u8'��������� ���������', radio1, 5)
-			imgui.RadioButton(u8'���������', radio1, 6)
+		if imgui.TreeNode(u8'Выберите что покупать') then
+			imgui.RadioButton(u8'Клик мыши', radio1, 0)
+			imgui.RadioButton(u8'Видеокарта', radio1, 1)
+			imgui.RadioButton(u8'Стойка видеокарт', radio1, 2)
+			imgui.RadioButton(u8'Суперкомпьютер', radio1, 3)
+			imgui.RadioButton(u8'Сервер Arizona Games', radio1, 4)
+			imgui.RadioButton(u8'Квантовый компьютер', radio1, 5)
+			imgui.RadioButton(u8'Датацентр', radio1, 6)
 			imgui.TreePop()
 		end
 
-		if imgui.TreeNode(u8'������� ������� ��������') then
 
-			imgui.Checkbox(u8'��� ������', nolimit)
+		if imgui.TreeNode(u8'Введите сколько покупать') then
+
+			imgui.Checkbox(u8'Без лимита', nolimit)
 			if nolimit.v == false then
-			imgui.InputInt('', limit, 1) end
+			imgui.InputInt('', limit, 1) imgui.Text(' ') end
 			imgui.TreePop()
 		end
 
 
-		if imgui.Button(u8'������') then
+
+		if imgui.Button(u8'Начать') then
 			if limit.v == 0 and nolimit.v == false then
-				sampAddChatMessage('[BotVkCoin] {FFFFFF}�� �� ���������� �����', 0xF1CB09)
+				sampAddChatMessage('[BotVkCoin] {FFFFFF}Вы не установили лимит', 0xF1CB09)
 			else if sampGetCurrentDialogId() == 25012 then
 				value = limit
 				activebot = true
-			else sampAddChatMessage('[BotVkCoin] {FFFFFF}�������� ������ � �������� ��������.', 0xF1CB09) end end
+			else sampAddChatMessage('[BotVkCoin] {FFFFFF}Откройте диалог с покупкой улчшений.', 0xF1CB09) end end
 		end
 
 		if activebot then
 			imgui.SameLine()
-			if imgui.Button(u8'����') then
+			if imgui.Button(u8'Стоп') then
 				activebot = false
 			end
 		end
@@ -248,9 +263,22 @@ function imgui.OnDrawFrame()
         imgui.NewLine()
         imgui.SameLine(3)
 
-	if imgui.TreeNode(u8'���� ������') then
-		imgui.Checkbox(u8'���������', click) imgui.SameLine()
-		ShowHelpMarker(u8'���� ���������� ������, ���������� �������� ��� ������.')
+	if imgui.TreeNode(u8'Коин кликер') then
+		imgui.Checkbox(u8'Активация', click) imgui.SameLine()
+		ShowHelpMarker(u8'Если коинкликер открыт, попробуйте откртыть его заного.')
+		imgui.TreePop()
+	end
+
+	imgui.Separator()
+        imgui.NewLine()
+        imgui.SameLine(3)
+
+	if imgui.TreeNode(u8'Общая задержка') then
+		imgui.Text(u8'Задержка:')
+		imgui.SameLine()
+		ShowHelpMarker(u8'Общая задержка влияет на скорость коин кликера и авто закупки улучшений. Для корректной работы рекомендуется ставить 350')
+		imgui.InputInt(' ', delay, 15)
+		imgui.Text(' ')
 		imgui.TreePop()
 	end
 
@@ -258,4 +286,40 @@ function imgui.OnDrawFrame()
         imgui.NewLine()
         imgui.SameLine(3)
 	imgui.End()
+end
+
+
+function update()
+  local fpath = os.getenv('TEMP') .. '\\testing_version.json' -- куда будет качаться наш файлик для сравнения версии
+  downloadUrlToFile('https://raw.githubusercontent.com/danil8515/coinbot/master/version.json', fpath, function(id, status, p1, p2) -- ссылку на ваш гитхаб где есть строчки которые я ввёл в теме или любой другой сайт
+    if status == dlstatus.STATUS_ENDDOWNLOADDATA then
+    local f = io.open(fpath, 'r') -- открывает файл
+    if f then
+      local info = decodeJson(f:read('*a')) -- читает
+      updatelink = info.updateurl
+      if info and info.latest then
+        version = tonumber(info.latest) -- переводит версию в число
+        if version > thisScript().version_num then -- если версия больше чем версия установленная то...
+          new = 1
+					sampAddChatMessage(('[BotVkCoin]: {FFFFFF}Доступно обновление!'), 0xF1CB09)
+        	else -- если меньше, то
+          update = false -- не даём обновиться
+          sampAddChatMessage(('[BotVkCoin]: {FFFFFF}У вас установлена последния версия!'), 0xF1CB09)
+        end
+      end
+    end
+  end
+end)
+end
+
+function goupdate()
+sampAddChatMessage(('[Testing]: Обнаружено обновление. AutoReload может конфликтовать. Обновляюсь...'), color)
+sampAddChatMessage(('[Testing]: Текущая версия: '..thisScript().version..". Новая версия: "..version), color)
+wait(300)
+downloadUrlToFile(updatelink, thisScript().path, function(id3, status1, p13, p23) -- качает ваш файлик с latest version
+  if status1 == dlstatus.STATUS_ENDDOWNLOADDATA then
+  sampAddChatMessage(('[Testing]: Обновление завершено!'), color)
+  thisScript():reload()
+end
+end)
 end
